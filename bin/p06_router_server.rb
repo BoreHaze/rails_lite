@@ -29,7 +29,6 @@ class StatusesController < Phase6::ControllerBase
 end
 
 class Cats2Controller < Phase6::ControllerBase
-  include RouteHelper
   def index
     render_content($cats.to_s, "text/text")
   end

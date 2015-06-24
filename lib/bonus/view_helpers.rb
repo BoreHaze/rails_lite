@@ -9,7 +9,7 @@ module ViewHelper
     HTML
   end
 
-  def button_to(post_path)
+  def button_to(name, url)
 
   end
 end
