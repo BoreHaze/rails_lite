@@ -23,6 +23,7 @@ module ViewHelper
     <<-HTML
 <form action='#{url}' method='POST'>
   #{hidden_method unless hidden_method.nil?}
+  <input type='hidden' name='authenticity_token' value='#{form_auth_token}'>
   <input value='#{name}' type='submit'>
 </form>
     HTML
