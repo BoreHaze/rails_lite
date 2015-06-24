@@ -1,6 +1,6 @@
 require 'webrick'
-require_relative '../lib/phase4/controller_base'
-require_relative '../lib/bonus/flash'
+require_relative '../lib/controller_base'
+require_relative '../lib/flash'
 
 describe Flash do
   let(:req) { WEBrick::HTTPRequest.new(Logger: nil) }
@@ -65,9 +65,9 @@ describe Flash do
   end
 end
 
-describe Phase4::ControllerBase do
+describe ControllerBase do
   before(:all) do
-    class CatsController < Phase4::ControllerBase
+    class CatsController < ControllerBase
     end
   end
   after(:all) { Object.send(:remove_const, "CatsController") }

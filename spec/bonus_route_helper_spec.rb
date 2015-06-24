@@ -1,6 +1,6 @@
 require 'webrick'
-require_relative '../lib/bonus/controller_base'
-require_relative '../lib/phase6/router'
+require_relative '../lib/controller_base'
+require_relative '../lib/router'
 require 'byebug'
 
 describe ControllerBase do
@@ -28,7 +28,7 @@ describe ControllerBase do
   end
 
   let(:router) do
-    router = Phase6::Router.new
+    router = Router.new
     router.draw do
       get Regexp.new("^/catz$"), CatzController, :index
       get Regexp.new("^/catz/\\d+$"), CatzController, :show
