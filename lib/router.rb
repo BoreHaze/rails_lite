@@ -1,11 +1,14 @@
 class Route
-  attr_reader :pattern, :http_method, :controller_class, :action_name
+  attr_reader :pattern, :http_method, :controller_class, :action_name, :router
 
-  def initialize(pattern, http_method, controller_class, action_name)
+  def initialize(pattern, http_method, controller_class, action_name, router)
     @pattern = pattern
     @http_method = http_method
     @controller_class = controller_class
     @action_name = action_name
+
+    #add a reference to router so controller will have access
+    @router = router
   end
 
   # checks if pattern matches path and method matches request method
@@ -24,7 +27,7 @@ class Route
       route_params[k] = route_matches[k]
     end
 
-    controller_class.new(req, res, route_params).invoke_action(action_name)
+    controller_class.new(req, res, route_params, router.routes).invoke_action(action_name)
   end
 end
 
@@ -37,7 +40,7 @@ class Router
 
   # simply adds a new route to the list of routes
   def add_route(pattern, method, controller_class, action_name)
-    @routes << Route.new(pattern, method, controller_class, action_name)
+    @routes << Route.new(pattern, method, controller_class, action_name, self)
   end
 
   # evaluate the proc in the context of the instance

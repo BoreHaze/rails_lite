@@ -5,6 +5,7 @@ require_relative '../lib/controller_base'
 describe Route do
   let(:req) { WEBrick::HTTPRequest.new(Logger: nil) }
   let(:res) { WEBrick::HTTPResponse.new(HTTPVersion: '1.0') }
+  let(:router) { Router.new }
 
   before(:each) do
     allow(req).to receive(:request_method).and_return("GET")
@@ -12,21 +13,21 @@ describe Route do
 
   describe "#matches?" do
     it "matches simple regular expression" do
-      index_route = Route.new(Regexp.new("^/users$"), :get, "x", :x)
+      index_route = Route.new(Regexp.new("^/users$"), :get, "x", :x, router)
       allow(req).to receive(:path) { "/users" }
       allow(req).to receive(:request_method) { :get }
       expect(index_route.matches?(req)).to be_truthy
     end
 
     it "matches regular expression with capture" do
-      index_route = Route.new(Regexp.new("^/users/(?<id>\\d+)$"), :get, "x", :x)
+      index_route = Route.new(Regexp.new("^/users/(?<id>\\d+)$"), :get, "x", :x, router)
       allow(req).to receive(:path) { "/users/1" }
       allow(req).to receive(:request_method) { :get }
       expect(index_route.matches?(req)).to be_truthy
     end
 
     it "correctly doesn't matche regular expression with capture" do
-      index_route = Route.new(Regexp.new("^/users/(?<id>\\d+)$"), :get, "UsersController", :index)
+      index_route = Route.new(Regexp.new("^/users/(?<id>\\d+)$"), :get, "UsersController", :index, router)
       allow(req).to receive(:path) { "/statuses/1" }
       allow(req).to receive(:request_method) { :get }
       expect(index_route.matches?(req)).to be_falsey
@@ -46,11 +47,11 @@ describe Route do
       dummy_controller_class = DummyController
       dummy_controller_instance = DummyController.new
       allow(dummy_controller_instance).to receive(:invoke_action)
-      allow(dummy_controller_class).to receive(:new).with(req, res, {}) do
+      allow(dummy_controller_class).to receive(:new).with(req, res, {}, router.routes) do
         dummy_controller_instance
       end
       expect(dummy_controller_instance).to receive(:invoke_action)
-      index_route = Route.new(Regexp.new("^/users$"), :get, dummy_controller_class, :index)
+      index_route = Route.new(Regexp.new("^/users$"), :get, dummy_controller_class, :index, router)
       index_route.run(req, res)
     end
   end

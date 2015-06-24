@@ -5,6 +5,7 @@ require_relative '../lib/router'
 describe "the symphony of things" do
   let(:req) { WEBrick::HTTPRequest.new(Logger: nil) }
   let(:res) { WEBrick::HTTPResponse.new(HTTPVersion: '1.0') }
+  let(:router) { Router.new }
 
   before(:all) do
     class Ctrlr < ControllerBase
@@ -26,7 +27,7 @@ describe "the symphony of things" do
 
   describe "routes and params" do
     it "route instantiates controller and calls invoke action" do
-      route = Route.new(Regexp.new("^/statuses/(?<id>\\d+)$"), :get, Ctrlr, :route_render)
+      route = Route.new(Regexp.new("^/statuses/(?<id>\\d+)$"), :get, Ctrlr, :route_render, router)
       allow(req).to receive(:path) { "/statuses/1" }
       allow(req).to receive(:request_method) { :get }
       route.run(req, res)
@@ -34,7 +35,7 @@ describe "the symphony of things" do
     end
 
     it "route adds to params" do
-      route = Route.new(Regexp.new("^/statuses/(?<id>\\d+)$"), :get, Ctrlr, :route_does_params)
+      route = Route.new(Regexp.new("^/statuses/(?<id>\\d+)$"), :get, Ctrlr, :route_does_params, router)
       allow(req).to receive(:path) { "/statuses/1" }
       allow(req).to receive(:request_method) { :get }
       route.run(req, res)
@@ -53,7 +54,7 @@ describe "the symphony of things" do
       ctrlr.update_session
       # Currently broken when flash is used. Need to store flash in the cookie
       # or change this spec.
-      expect(res.cookies.count).to eq(2)
+      expect(res.cookies.count).to eq(3)
       expect(JSON.parse(res.cookies[0].value)["token"]).to eq("testing")
     end
   end

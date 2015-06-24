@@ -9,9 +9,15 @@ require_relative './params'
 require_relative './session'
 require_relative './authenticity_token'
 
+class InvalidCSRFTokenError < StandardError; end
+
 class ControllerBase
+
+  DANGER_METHODS = [:post, :patch, :put, :delete]
+
   include RouteHelper
   include ViewHelper
+  include AuthenticityToken
   attr_reader :req, :res, :params
 
   def initialize(req, res, route_params = {}, routes = {})
@@ -19,29 +25,32 @@ class ControllerBase
     @params = Params.new(req, route_params)
     @req = req
     @res = res
+
+    #left condition to unbreak tests
+    if !@req.request_method.nil? && DANGER_METHODS.include?(@req.request_method.downcase.to_sym)
+      unless check_form_auth_token(@params[:authenticity_token])
+        raise InvalidCSRFTokenError
+      end
+    end
   end
 
-
-  # Helper method to alias @already_built_response
   def already_built_response?
     @already_built_response
   end
 
-  # Set the response status code and header
   def redirect_to(url)
     session.store_session(self.res)
     flash.store_flash(self.res)
+    set_auth_token(self.res)
     self.res.status = 302
     self.res.header['location'] = url
     self.render_content(nil, nil)
   end
 
-  # Populate the response with content.
-  # Set the response's content type to the given type.
-  # Raise an error if the developer tries to double render.
   def render_content(content, content_type)
     session.store_session(self.res)
     flash.store_flash(self.res)
+    set_auth_token(self.res)
     self.res.content_type = content_type
     raise RuntimeError if already_built_response?
     self.res.body = content
@@ -55,7 +64,6 @@ class ControllerBase
     render_content(content, "text/html")
   end
 
-  # method exposing a `Session` object
   def session
     @session ||= Session.new(self.req)
   end

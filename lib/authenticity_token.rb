@@ -1,12 +1,12 @@
 require 'SecureRandom'
 
-module AuthTokenGetter
+module AuthenticityToken
 
-  def old_token
-    @old_token ||= get_old_token(@req)
+  def prior_token
+    @prior_token ||= get_prior_token(@req)
   end
 
-  def get_old_token(req)
+  def get_prior_token(req)
     prior_token_cookie = req.cookies.find { |c| c.name == "authenticity_token"}
     if prior_token_cookie.nil?
       nil
@@ -15,18 +15,15 @@ module AuthTokenGetter
     end
   end
 
-  def check_form_auth_token(token)
-    token == old_token
+  def check_form_auth_token(body)
+    body.include?(prior_token)
   end
-end
-
-module AuthTokenSetter
 
   def generate_auth_token
     SecureRandom::urlsafe_base64(64)
   end
 
-  def set_response_token(res)
+  def set_auth_token(res)
     res.cookies << WEBrick::Cookie.new("authenticity_token", new_token.to_json)
   end
 
