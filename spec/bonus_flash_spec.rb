@@ -1,7 +1,6 @@
 require 'webrick'
-require_relative '../lib/phase4/flash_controller_base'
+require_relative '../lib/phase4/controller_base'
 require_relative '../lib/bonus/flash'
-require 'byebug'
 
 describe Flash do
   let(:req) { WEBrick::HTTPRequest.new(Logger: nil) }
@@ -42,7 +41,7 @@ describe Flash do
 
     context "with cookies in request" do
       before(:each) do
-        cook = WEBrick::Cookie.new('_rails_lite_app_flash', { now: "rightnow", pho: "soup" }.to_json)
+        cook = WEBrick::Cookie.new('_rails_lite_app_flash', { now: {"rightnow" => "hotsoup"}, pho: "soup" }.to_json)
         req.cookies << cook
       end
 
