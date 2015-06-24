@@ -8,10 +8,16 @@ class Flash
       if cookie.name == "_rails_lite_app_flash"
         @flash_hash = JSON.parse(cookie.value)
         now_hash = {}
+        expiring = {}
         @flash_hash.each do |k, v|
-          next if k == "now"
-          @flash_hash.delete(k)
-          now_hash[k] = v
+          if k == "now"
+            v.each do |nk, nv|
+              expiring[nk] = nv
+            end
+          else
+            @flash_hash.delete(k)
+            now_hash[k] = v
+          end
         end
 
         @flash_hash["now"] = now_hash
@@ -29,7 +35,14 @@ class Flash
   end
 
   def now
-    @flash_hash["now"]
+    @flash_hash["now"] || @flash_hash["now"] = {}
+  end
+
+  def now=(hash)
+    now = self.now
+    hash.each do |k,v|
+      now[k] = v
+    end
   end
 
   def [](key)
@@ -42,7 +55,6 @@ class Flash
 
 
   def store_flash(res)
-
     res.cookies << WEBrick::Cookie.new("_rails_lite_app_flash", @flash_hash.to_json)
   end
 

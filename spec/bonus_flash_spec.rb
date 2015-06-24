@@ -1,16 +1,24 @@
 require 'webrick'
 require_relative '../lib/phase4/flash_controller_base'
 require_relative '../lib/bonus/flash'
+require 'byebug'
 
 describe Flash do
   let(:req) { WEBrick::HTTPRequest.new(Logger: nil) }
   let(:res) { WEBrick::HTTPResponse.new(HTTPVersion: '1.0') }
   let(:cook) { WEBrick::Cookie.new('_rails_lite_app_flash', { xyz: 'abc' }.to_json) }
+  let(:now_cook) { WEBrick::Cookie.new('_rails_lite_app_flash', {now: { xyz: 'abc' }}.to_json) }
 
   it "deserializes json cookie if one exists, and moves data to now_hash" do
     req.cookies << cook
     flash = Flash.new(req)
     expect(flash.now['xyz']).to eq('abc')
+  end
+
+  it "deserializes json cookie if one exists, and purges the now_hash if it exists" do
+    req.cookies << now_cook
+    flash = Flash.new(req)
+    expect(flash.now['xyz']).to be(nil)
   end
 
   describe "#store_flash" do
@@ -89,12 +97,13 @@ describe Phase4::ControllerBase do
       expect(h['test_key']).to eq('test_value')
     end
 
-    it "should move old data to the now_hash and purge data already in the now_hash" do
-      cats_controller.flash.now({'test_key' => 'test_value'})
+    it "should store data in the now hash" do
+      cats_controller.flash.now = ({'test_key' => 'test_value'})
       cats_controller.send(method, *args)
       cookie = res.cookies.find { |c| c.name == '_rails_lite_app_flash' }
       h = JSON.parse(cookie.value)
-      expect(h.now['test_key']).to eq('test_value')
+      expect(h.keys).not_to include('test_key')
+      expect(h['now']['test_key']).to eq('test_value')
     end
   end
 
