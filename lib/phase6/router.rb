@@ -1,3 +1,5 @@
+require_relative '../bonus/route_helper'
+
 module Phase6
   class Route
     attr_reader :pattern, :http_method, :controller_class, :action_name
@@ -30,6 +32,8 @@ module Phase6
   end
 
   class Router
+    include RouteHelper
+    
     attr_reader :routes
 
     def initialize
