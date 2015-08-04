@@ -23,13 +23,13 @@ class StatusesController < ControllerBase
   end
 end
 
-class Cats2Controller < Controller
+class Cats2Controller < ControllerBase
   def index
     render_content($cats.to_s, "text/text")
   end
 end
 
-router = Phase6::Router.new
+router = Router.new
 router.draw do
   get Regexp.new("^/cats$"), Cats2Controller, :index
   get Regexp.new("^/cats/new$"), Cats2Controller, :new
