@@ -12,7 +12,7 @@
 
   To use Rails Lite (which is highly inadvisable at present), you simply need to define a controller and your set of desired routes, in a manner similar to the more verbose version of the Rails convention, then start a Webrick instance with a block invoking the router's run method. Here's an example:
 
-  '''ruby
+  ```ruby
   class CatsController < Controller
     def index
       render_content(cats_index_template, "text/text")
@@ -29,4 +29,4 @@
   server.mount_proc('/') do |req, res|
     route = router.run(req, res)
   end
-  '''
+  ```
