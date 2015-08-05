@@ -26,7 +26,6 @@ module RouteHelper
         end
         result
       end
-      # puts "Defining #{helper_name.to_s}"
     end
   end
 end

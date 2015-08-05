@@ -26,7 +26,6 @@ class ControllerBase
     @req = req
     @res = res
 
-    #left condition to unbreak tests
     if !@req.request_method.nil? && DANGER_METHODS.include?(@req.request_method.downcase.to_sym)
       unless check_form_auth_token(@params[:authenticity_token])
         raise InvalidCSRFTokenError

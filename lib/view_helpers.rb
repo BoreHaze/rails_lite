@@ -5,7 +5,6 @@ module ViewHelper
   def link_to(name, url)
 
     link_url = "#{url}"
-    #Check that route is valid? Need access to router from controller?
 
     <<-HTML
 <a href=#{link_url}>#{name}</a>
